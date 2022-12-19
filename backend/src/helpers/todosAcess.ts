@@ -3,6 +3,7 @@ import * as AWS from 'aws-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
+import { TodoUpdate } from '../models/TodoUpdate'
 // import { TodoUpdate } from '../models/TodoUpdate';
 
 // const XAWS = AWSXRay.captureAWS(AWS)
@@ -57,6 +58,31 @@ export class TodosAccess {
             return todo
         } catch (error) {
             logger.error('Error create todo: ', error)
+        }
+    }
+
+    async updateTodo(todoId: string, userId: string, todo: TodoUpdate) {
+        logger.info(`Updating a todo with id: ${todoId}`)
+        try {
+            await this.docClient.update({
+                TableName: this.todosTable,
+                Key: {
+                    userId,
+                    todoId
+                },
+                UpdateExpression: 'set #nameTodo = :name, dueDate = :dueDate, done = :done',
+                ExpressionAttributeValues: {
+                    ':name': todo.name,
+                    ':dueDate': todo.dueDate,
+                    ':done': todo.done
+                },
+                ExpressionAttributeNames: {
+                    '#nameTodo': 'name'
+                }
+            }).promise();
+
+        } catch (error) {
+            logger.error('Error update todo: ', error)
         }
     }
 }

@@ -8,6 +8,7 @@ import * as uuid from 'uuid'
 // import * as createError from 'http-errors'
 import { getUserId } from '../lambda/utils'
 import { APIGatewayProxyEvent } from 'aws-lambda'
+import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 
 const todosAccess = new TodosAccess()
 
@@ -31,4 +32,9 @@ export const createTodo = async (createTodoRequest: CreateTodoRequest, event: AP
     }
 
     return await todosAccess.createTodo(newTodo)
+}
+
+export const updateTodo = async (updateTodoRequest: UpdateTodoRequest, todoId: string, event: APIGatewayProxyEvent) => {
+    const userId = getUserId(event);
+    await todosAccess.updateTodo(todoId, userId, updateTodoRequest)
 }
