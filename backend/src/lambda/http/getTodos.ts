@@ -10,16 +10,14 @@ import { getAllTodos } from '../../helpers/todos'
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     // Write your code here
-    const todos = getAllTodos(event)
+    const todos = await getAllTodos(event)
 
     return {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({
-        items: todos
-      })
+      body: JSON.stringify(todos)
     }
   }
 )

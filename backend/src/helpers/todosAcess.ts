@@ -1,11 +1,11 @@
 import * as AWS from 'aws-sdk'
-import * as AWSXRay from 'aws-xray-sdk'
+// import * as AWSXRay from 'aws-xray-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
-import { TodoUpdate } from '../models/TodoUpdate';
+// import { TodoUpdate } from '../models/TodoUpdate';
 
-const XAWS = AWSXRay.captureAWS(AWS)
+// const XAWS = AWSXRay.captureAWS(AWS)
 
 const logger = createLogger('TodosAccess')
 
@@ -18,7 +18,7 @@ export class TodosAccess {
     ) { }
 
     async getTodos(userId: string) {
-        logger.log("getTodos()", 'Getting all todos')
+        logger.info('userId: ', userId)
         const result = await this.docClient.query({
             TableName: this.todosTable,
             IndexName: this.todosIdIndex,
@@ -34,7 +34,7 @@ export class TodosAccess {
                 headers: {
                     'Access-Control-Allow-Origin': '*'
                 },
-                body: JSON.stringify(result.Items[0])
+                body: result.Items
             }
         }
 
@@ -48,11 +48,15 @@ export class TodosAccess {
     }
 
     async createTodo(todo: TodoItem) {
-        await this.docClient.put({
-            TableName: this.todosTable,
-            Item: todo
-        })
+        try {
+            await this.docClient.put({
+                TableName: this.todosTable,
+                Item: todo
+            }).promise()
 
-        return todo
+            return todo
+        } catch (error) {
+            logger.error('Error create todo: ', error)
+        }
     }
 }
