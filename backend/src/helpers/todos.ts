@@ -38,3 +38,8 @@ export const updateTodo = async (updateTodoRequest: UpdateTodoRequest, todoId: s
     const userId = getUserId(event);
     await todosAccess.updateTodo(todoId, userId, updateTodoRequest)
 }
+
+export const deleteTodo = async (todoId: string, event: APIGatewayProxyEvent) => {
+    const userId = getUserId(event);
+    await todosAccess.deleteTodo(userId, todoId)
+}
