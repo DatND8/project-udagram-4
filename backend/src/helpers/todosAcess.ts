@@ -1,12 +1,8 @@
 import * as AWS from 'aws-sdk'
-// import * as AWSXRay from 'aws-xray-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate'
-// import { TodoUpdate } from '../models/TodoUpdate';
-
-// const XAWS = AWSXRay.captureAWS(AWS)
 
 const logger = createLogger('TodosAccess')
 
@@ -94,6 +90,25 @@ export class TodosAccess {
 
         } catch (error) {
             logger.error('Error update todo: ', error)
+        }
+    }
+
+    async attachTodoUrl(todoId: string, userId: string, url: string) {
+        logger.info('Process attachTodoUrl')
+        try {
+            await this.docClient.update({
+                TableName: this.todosTable,
+                Key: {
+                    userId,
+                    todoId
+                },
+                UpdateExpression: 'set attachmentUrl = :attachmentUrl',
+                ExpressionAttributeValues: {
+                    ':attachmentUrl': url
+                }
+            }).promise()
+        } catch (error) {
+            logger.error('attachTodoUrl failed: ', error)
         }
     }
 }
